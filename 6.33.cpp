@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void print_vec (const vector<int> &v, int i)
+void print_vec (const vector<string> &v, int i)
 {
     if (i == v.size())  return ;
     cout << v[i++] << " ";
@@ -20,7 +20,7 @@ void print_vec (const vector<int> &v, int i)
 int main()
 {
     int i=0;
-    vector<int> v{10,5,3,2,3,2,44,1};
+    vector<string> v{"hello", "world", "your", "wu", "is", "too", "bigbig"};
     print_vec(v, i);
     return 0;
 }
