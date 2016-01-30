@@ -24,6 +24,11 @@ using std :: cerr;
 void read_file (const string& filename, vector<string>& s)
 {
     ifstream in(filename);
+
+    if (!in) {
+        cerr << "No data!" << endl;
+        return ;
+    }
     while (in) {
         string buf;
         if (std :: getline(in, buf)) {
@@ -39,8 +44,8 @@ int main()
 
     read_file("file", s);
     for (auto& buf : s) {
-        istringstream strm(buf);  //定义一个string输入类型，将绑定到刚读入的行
-        string word;　　　
+        istringstream strm(buf);  //定义一个string输入类型，将绑定到刚读入的行 
+        string word;
         while(strm >> word) {
             cout << word << endl;
         }
