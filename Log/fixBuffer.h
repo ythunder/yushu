@@ -21,8 +21,8 @@ namespace netlib
         FixBuffer()
             :buffer_(1024*1024*4)
         {
-            this.readableIndex_ = 0;
-            this.writeableINdex_ = 0;
+            this->readableIndex_ = 0;
+            this->writeableIndex_ = 0;
         }
 
         ~FixBuffer()
@@ -31,12 +31,12 @@ namespace netlib
 
         int readableSize(void)   //可读字节数
         {
-            return this.writeableINdex_ - readableIndex_;
+            return this->writeableIndex_ - readableIndex_;
         }
 
         int writeableSize(void)   //可写字节数
         {
-            return buffer_.size() - this.writeableIndex_;
+            return buffer_.size() - this->writeableIndex_;
         }
 
         void append(const char *data, int len)    //缓冲区写入字符串
@@ -72,5 +72,6 @@ namespace netlib
         std::vector<char> buffer_;
         int readableIndex_;
         int writeableIndex_;
-    }
+    };
+}
 #endif
