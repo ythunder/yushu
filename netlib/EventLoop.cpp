@@ -8,20 +8,37 @@
 #ifndef _EVENTLOOP_H
 #define _EVENTLOOP_H
 
-#include <vector>
-#include "Channel.h"
-#include "Poller.h"
-#include <functional>
+#include "EventLoop.h"
 
-class EventLoop
+
+__thread EventLoop* t_loopInThisThread = 0;
+
+int createEventfd()
 {
-public:
-    typedef std::function<void()> Funtor;
+    int evtfd = :;eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    if(evtfd < 0)
+    {
 
-    EventLoop();
+    }
+    return evtfd;
+}
+
+EventLoop::EventLoop()
+    :looping_(false),
+    quit_(false),
+
+{
+    
+}
     ~EventLoop();
 
-    void loop();
+void 
+EventLoop::loop()
+{
+    assert(!looping_);
+    assert(assertInLoopThread());
+
+}
 
     void quit();
 
@@ -35,7 +52,10 @@ public:
 
     void removeChannel(Channel* channel);
 
-    bool assertInLoopThread();
+    bool assertInLoopThread()
+    {
+        static_cast<pid_t>(::syscall(SYS_gettid)) == threadId_;
+    }
 
 private:
     bool looping_;

@@ -8,6 +8,11 @@
 #ifndef _CHANNEL_H
 #define _CHANNEL_H
 
+#include "Timestamp.h"
+#include "EventLoop.h"
+#include <functional>
+#include <memory>
+#include "callback.h"
 class Channel
 {
 public:
@@ -15,7 +20,7 @@ public:
     typedef std::function<void(Timestamp)> ReadEventCallback;
 
     /*构造函数*/
-   Channel::Channel(EventLoop* loop, int fd)
+   Channel(EventLoop* loop, int fd)
     :loop_(loop),
     fd_(fd),
     events_(0),
@@ -30,7 +35,7 @@ public:
 /*设置事件类型或获得事件类型*/
 void enableReading() { events_ |= kReadEvent;  }
 void enableWriting() { events_ |= kWriteEvent; }
-void disableReading() { event_ &= ~kReadEvent; }
+void disableReading() { events_ &= ~kReadEvent; }
 void disableWriting() { events_ &= ~kWriteEvent; }
 bool isReading() const { return events_ & kReadEvent; }
 bool isWriting() const { return events_ & kWriteEvent; }
@@ -46,7 +51,26 @@ void setErrorCallback(const EventCallback& cb)
     { errorCallback_ = cb; }
 
 
-    
+    int fd()
+    {
+        return fd_;
+    }
+
+    int events()
+    {
+        return events_;
+    }
+
+    int revents()
+    {
+        return revents_;
+    }
+
+
+void set_revents(int revents)
+{
+    revents_ = revents;
+}
 private:
     /*三种事件类型的值定义*/
     static const int kNoneEvent;   
@@ -63,6 +87,6 @@ private:
     EventCallback closeCallback_;
     EventCallback errorCallback_;
 
-}
+};
 
 #endif

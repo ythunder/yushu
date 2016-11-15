@@ -23,12 +23,13 @@
 Socket::Socket(int sockfd)
     :sockfd_(sockfd)
 {
-    setNonBlocking();
+   // setNonBlocking();
 }
 
 Socket::~Socket()
 {}
 
+/*
 int
 Socket::setNonBlocking()
 {
@@ -37,7 +38,7 @@ Socket::setNonBlocking()
     fcntl(sockfd_, F_SETFL, new_option);
     return old_option;
 }
-
+*/
 
 void 
 Socket::bindAddress(char* ip, int port)
@@ -49,6 +50,10 @@ Socket::bindAddress(char* ip, int port)
     address.sin_port = htons( port);
 
     int ret = ::bind(sockfd_, (struct sockaddr*)&address, sizeof(address));
+    if(ret < 0)
+    {
+        std::cout << errno ;
+    }
     assert( ret != -1 );
 }
 
@@ -64,7 +69,7 @@ int
 Socket::accept(struct sockaddr_in* addr)
 {
     socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
-    int connfd = ::accept(sockfd_, (struct sockaddr*)&addr, &addrlen);
+    int connfd = ::accept4(sockfd_, (struct sockaddr*)&addr, &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
    // setNonBlocking();
     if(connfd > 0)
     {
@@ -72,7 +77,9 @@ Socket::accept(struct sockaddr_in* addr)
     }
     if(connfd < 0)
     {
+        std::cout << errno ;
         int saveErrno = errno;
+        std::cout << "accept errno-----";
         switch(saveErrno)
         {
             case EBADF: std::cout << "描述符无效\n"; break;
@@ -96,6 +103,7 @@ Socket::connect(const struct sockaddr* addr)
     if(ret < 0)
     {
         int saveErrno = errno;
+        std::cout << "connect errno----";
         switch(saveErrno)
         {
             case EISCONN: std::cout << "sockfd已连接\n";  break;

@@ -36,14 +36,13 @@ int main()
 
     while(1)
     {
-        struct sockaddr_in* peeraddr;
+        struct sockaddr_in peeraddr;
 
-        int connfd = sock.accept(peeraddr);
+        int connfd = sock.accept(&peeraddr);
 
         sleep(15);
 
        sock.read(connfd, (void*)&buf, sizeof(buf));
-
     }
 
     return 0;

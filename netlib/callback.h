@@ -9,15 +9,15 @@
 #define _CALLBACK_H
 
 #include <functional>
-#include "connection.h"
+#include "TcpConnection.h"
 #include <memory>
 
 namespace net
 {
     typedef std::function<void(void)> ConnectionCallback;
-    typedef std::function<void(std::shared_ptr<Connection>)> MessageCallback;
-    typedef std::function<void(std::shared_ptr<connection>)> CloseCallback;
-    typedef std::function<void(std::shared_ptr<Connection>)> WriteCompleteCallback;
+    typedef std::function<void(std::shared_ptr<TcpConnection>)> MessageCallback;
+    typedef std::function<void(std::shared_ptr<TcpConnection>)> CloseCallback;
+    typedef std::function<void(std::shared_ptr<TcpConnection>)> WriteCompleteCallback;
 }
 
 #endif
