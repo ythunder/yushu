@@ -12,14 +12,18 @@
 #include "Socket.h"
 #include "Channel.h"
 #include "EventLoop.h"
+#include "callback.h"
 
 class Acceptor
 {
 public:
+
+    typedef std::function<void(int connfd, struct sockaddr_in peer)> NewConnectionCallback;
+
 /*初始化loop,创建监听套接字，初始化事件分发器*/
     Acceptor(EventLoop *loop, char* ip, int port)
     :loop_(loop),
-    accpetSocket_(::socket(PF_INET,SOCK_STREAM | , IPPROTO_TCP)),
+    accpetSocket_(::socket(PF_INET,SOCK_STREAM | IPPROTO_TCP)),
     accpetSocket_.bindAddress(ip, port),
     acceptChannel_(loop, accpetSocket_.fd())
     {
@@ -35,7 +39,7 @@ public:
     }
 
     /*设置新连接回调函数*/
-    void setNewConnectionCallback(NewConnectionCallback& cb)
+    void setNewConnectionCallback(NewConnectionCallback cb)
     {
         newConnectionCallback_ = cb;
     }
@@ -64,7 +68,6 @@ private:
                 newConnectionCallback_(connfd, peerAddr);
             }
         }
-
 
     }
 

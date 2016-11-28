@@ -12,12 +12,9 @@
 #include "TcpConnection.h"
 #include <memory>
 
-namespace net
-{
     typedef std::function<void(void)> ConnectionCallback;
     typedef std::function<void(std::shared_ptr<TcpConnection>)> MessageCallback;
     typedef std::function<void(std::shared_ptr<TcpConnection>)> CloseCallback;
     typedef std::function<void(std::shared_ptr<TcpConnection>)> WriteCompleteCallback;
-}
-
+    typedef std::function<void(int, struct sockaddr_in)> NewConnectionCallback;
 #endif

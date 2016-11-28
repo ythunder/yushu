@@ -5,11 +5,13 @@
 	> Created Time: 2016年11月12日 星期六 00时31分48秒
  ************************************************************************/
 
-
+#include <iostream>
 #include "Epoller.h"
 #include <vector>
 #include <map>
 #include <sys/epoll.h>
+#include <string.h>
+#include <unistd.h>
 
 
 Epoller::Epoller(EventLoop* loop)
@@ -69,14 +71,14 @@ Epoller::poll(int timeoutMs, ChannelList* activeChannels)
 
 
 void 
-Epoller::updateChannnel(int operation, Channel* channel)
+Epoller::updateChannel(Channel* channel)
 {
     struct epoll_event event;
     bzero(&event, sizeof(event));
     event.events = channel->events();
     event.data.ptr = channel;
     int fd = channel->fd();
-    if( ::epoll_ctl(epollfd_, operation, fd, &event) < 0)
+    if( ::epoll_ctl(epollfd_,EPOLL_CTL_ADD, fd, &event) < 0)
     {
         int saveError = errno;
         /*错误处理*/

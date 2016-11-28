@@ -1,4 +1,4 @@
-/*************************************************************************
+/**********************************************************************
     > File Name: Epoller.h
     > Author: 
     > Mail: 
@@ -12,19 +12,20 @@
 #include <map>
 #include <vector>
 #include "Channel.h"
+#include "EventLoop.h"
 
-struct epoll_event;
+//struct epoll_event;
 
 class Epoller
 {
+
 public:
-    
     typedef std::vector<Channel*> ChannelList;
     Epoller(EventLoop* loop);
     ~Epoller();
 
     Timestamp poll(int timeoutMs, ChannelList* activeChannels);
-    void updateChannnel(int operation, Channel* channel);
+    void updateChannel(Channel* channel);
     void removeChannel(Channel* channel);
     void fillActiveChannels(int numEvents, ChannelList* activeChannels);
 

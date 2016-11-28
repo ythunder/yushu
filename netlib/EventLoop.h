@@ -8,44 +8,61 @@
 #ifndef _EVENTLOOP_H
 #define _EVENTLOOP_H
 
+
 #include <vector>
-#include "Channel.h"
-#include "Poller.h"
+#include "Epoller.h"
 #include <functional>
+#include <boost/scoped_ptr.hpp>
+#include <boost/bind.hpp>
+#include "Channel.h"
+
+
 
 class EventLoop
 {
 public:
-    typedef std::function<void()> Funtor;
+    typedef std::function<void()> Functor;
 
     EventLoop();
     ~EventLoop();
 
-    void loop();
+    void loop();   //开始循环
 
-    void quit();
+    void quit();  //退出循环
 
-    void runInLoop(const Funtor& cb);
+    void runInLoop(const Functor& cb);   //本循环执行回调
 
-    void queueInLoop(const Functor& cb);
+    void queueInLoop(const Functor& cb);  //不在当前循环，加入队列
 
-    void wakeup();
+    void wakeup();  //唤醒I/O循环
 
-    void updateChannel(Channel* channel);
+    void updateChannel(Channel* channel);  //更新事件分发表
 
-    void removeChannel(Channel* channel);
+    void removeChannel(Channel* channel);  //移除事件分发器
 
-    bool assertInLoopThread();
+    bool assertInLoopThread();   //判断是否在当前线程
+
+    void doPendingFunctors();
+
+    void handleRead();
 
 private:
     bool looping_;
     bool quit_;
-    const pid_t threadId_;
-    Timestamp pollReturnTime_;
-    boost::scoped_ptr<Epoller> poller_;
-    boost::scoped_ptr<TimeQueue> timerQueue_;
-    int wakeupFd_;
-    boost::scoped_ptr<Channel> wakeupChannel_;
-};
 
+    pid_t threadId_;                /*当前循环所属线程ID*/
+    Timestamp pollReturnTime_;      /*poll返回时间*/
+
+    boost::scoped_ptr<Epoller> poller_;    /*当前循环的poll*/
+    
+    int wakeupFd_;     /*唤醒eventfd*/
+    boost::scoped_ptr<Channel> wakeupChannel_;  /*唤醒eventfd对应的Channel*/  
+
+    typedef std::vector<Channel*> ChannelList;
+    ChannelList activeChannels_;      /*活跃事件表*/
+
+    Channel* currentActiveChannel_;   /*当前正在处理的活跃事件*/
+
+    std::vector<Functor> pendingFunctors_;  /*存储别的线程的活跃任务一会处理*/
+};
 #endif

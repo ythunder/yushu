@@ -4,9 +4,7 @@
 	> Mail: 
 	> Created Time: 2016年11月09日 星期三 22时35分59秒
  ************************************************************************/
-
-#include "Socket.h"
-#include "Socket.cpp"
+#include "Acceptor.h"
 #include <errno.h>
 #include <iostream>
 #include <fcntl.h>
@@ -20,30 +18,26 @@
 #include <sys/types.h>
 #include <netinet/tcp.h>
 
+void 
+conn_back(int connfd, struct sockaddr_in peer)
+{
+    std::cout << "connfd: " << connfd << std::endl;
+}
+
+
 int main()
 {
     char *ip = "127.0.0.1";
     int port = 8888;
     char buf[1024];
 
-    int listenfd = socket(PF_INET, SOCK_STREAM, 0);
+    EventLoop *eventloop;
 
-    Socket sock(listenfd);
+    Acceptor acceptor(eventloop,ip,port);
 
-    sock.bindAddress(ip, port);
+    acceptor.setNewConnectionCallback(conn_back);
 
-    sock.listen();
-
-    while(1)
-    {
-        struct sockaddr_in peeraddr;
-
-        int connfd = sock.accept(&peeraddr);
-
-        sleep(15);
-
-       sock.read(connfd, (void*)&buf, sizeof(buf));
-    }
+    acceptor.listen();
 
     return 0;
 }
