@@ -16,20 +16,24 @@
 
 //struct epoll_event;
 
+class EventLoop;
+class Channel;
+
 class Epoller
 {
 
 public:
-    typedef std::vector<Channel*> ChannelList;
-    Epoller(EventLoop* loop);
+    typedef std::vector<Channel *> ChannelList;
+    Epoller();
     ~Epoller();
 
-    Timestamp poll(int timeoutMs, ChannelList* activeChannels);
+    int poll(int timeoutMs, ChannelList* activeChannels);
     void updateChannel(Channel* channel);
     void removeChannel(Channel* channel);
     void fillActiveChannels(int numEvents, ChannelList* activeChannels);
 
 private:
+
     int kInitEventListSize = 16;
 
     int epollfd_;

@@ -14,9 +14,8 @@
 #include <unistd.h>
 
 
-Epoller::Epoller(EventLoop* loop)
-    :ownerLoop_(loop),
-    epollfd_(::epoll_create(5)),
+Epoller::Epoller()
+    :epollfd_(::epoll_create(5)),
     events_(kInitEventListSize)
 {
 }
@@ -40,15 +39,14 @@ Epoller::fillActiveChannels(int numEvents, ChannelList* activeChannels)
 }
 
 
-Timestamp 
+int 
 Epoller::poll(int timeoutMs, ChannelList* activeChannels)
 {
+
     int numEvents = ::epoll_wait(epollfd_,
                                &*events_.begin(),
                                static_cast<int>(events_.size()),
                                timeoutMs);
-    Timestamp n;
-    Timestamp now = n.now();
 
     if(numEvents > 0)
     {
@@ -60,11 +58,11 @@ Epoller::poll(int timeoutMs, ChannelList* activeChannels)
     }
     else
     {
-        /**
-         *标准错误判断
-       */
+        
+         //标准错误判断
     }
-    return now;
+
+    return numEvents;
 }
 
 

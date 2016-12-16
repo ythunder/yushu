@@ -17,7 +17,7 @@ public:
 
     ~Socket();
 
-    //int setNonBlocking();   //设置为非阻塞
+    int setNonBlocking();   //设置为非阻塞
 
     ssize_t read(int fd, void *buf, size_t count);   //读取套接字
 

@@ -23,13 +23,13 @@
 Socket::Socket(int sockfd)
     :sockfd_(sockfd)
 {
-   // setNonBlocking();
+   setNonBlocking();
 }
 
 Socket::~Socket()
 {}
 
-/*
+
 int
 Socket::setNonBlocking()
 {
@@ -38,7 +38,15 @@ Socket::setNonBlocking()
     fcntl(sockfd_, F_SETFL, new_option);
     return old_option;
 }
-*/
+
+int
+setNonBlock(int connfd)
+{
+    int old_option = fcntl(connfd, F_GETFL);
+    int new_option = old_option | O_NONBLOCK;
+    fcntl(connfd, F_SETFL, new_option);
+    return old_option;
+}
 
 void 
 Socket::bindAddress(char* ip, int port)
@@ -69,29 +77,15 @@ int
 Socket::accept(struct sockaddr_in* addr)
 {
     socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
-    int connfd = ::accept4(sockfd_, (struct sockaddr*)&addr, &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
-   // setNonBlocking();
+    int connfd = ::accept(sockfd_, (struct sockaddr*)&addr, &addrlen);
+    setNonBlock(connfd);
     if(connfd > 0)
     {
         std::cout << "accept a connection\n";
     }
     if(connfd < 0)
     {
-        std::cout << errno ;
         int saveErrno = errno;
-        std::cout << "accept errno-----";
-        switch(saveErrno)
-        {
-            case EBADF: std::cout << "描述符无效\n"; break;
-            case ECONNABORTED: std::cout << "连接被中止\n"; break;
-            case EFAULT:  std::cout << "addr参数不可写\n"; break;
-            case EINTR: std::cout << "系统调用连接到达前被信号中止\n"; break;
-            case EINVAL: std::cout << "sockfd没有正在监听或者addrlen无效\n"; break;
-            case ENFILE: std::cout << "系统文件打开总数达上限\n"; break;
-            case EOPNOTSUPP: std::cout << "sockfd不是SOCK_STREAM类型\n"; break;
-            case EPROTO: std::cout << "协议错误\n"; break;      
-            default: std::cout << "else errno\n"; break;
-        }
     }
     return connfd;
 }
@@ -161,6 +155,7 @@ Socket::setReusePort(bool on)
 void 
 Socket::close()
 {
+    std::cout << "sockfd has been closed\n";
     ::close(sockfd_);
 }
 

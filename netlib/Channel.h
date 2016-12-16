@@ -5,19 +5,23 @@
 	> Created Time: 2016年11月09日 星期三 12时18分05秒
  ************************************************************************/
 
-#ifndef _CHANNEL_H
-#define _CHANNEL_H
+#ifndef CHANNEL_H
+#define CHANNEL_H
 
 #include "Timestamp.h"
 #include "EventLoop.h"
 #include <functional>
 #include <memory>
+#include <poll.h>
 #include "callback.h"
+
+class EventLoop;
+
 class Channel
 {
 public:
     typedef std::function<void()> EventCallback;
-    typedef std::function<void(Timestamp)> ReadEventCallback;
+    typedef std::function<void()> ReadEventCallback;
 
     /*构造函数*/
    Channel(EventLoop* loop, int fd)
@@ -28,17 +32,34 @@ public:
 {
 }
 
-~Channel()
+    ~Channel()
 {
 }
 
-/*设置事件类型或获得事件类型*/
-void enableReading() { events_ |= kReadEvent;  }
-void enableWriting() { events_ |= kWriteEvent; }
-void disableReading() { events_ &= ~kReadEvent; }
-void disableWriting() { events_ &= ~kWriteEvent; }
-bool isReading() const { return events_ & kReadEvent; }
-bool isWriting() const { return events_ & kWriteEvent; }
+
+EventLoop* ownerLoop()
+{
+    return loop_;    
+}
+
+
+/*设置事件处理函数*/
+void handleEvent()
+{
+    if(revents_ &  POLLIN)
+    {
+        if(readCallback_) readCallback_();
+    }
+    else if(revents_ & POLLOUT)
+    {
+        if(writeCallback_) writeCallback_();
+    }
+    else if(revents_ & POLLERR)
+    {
+        if(errorCallback_) errorCallback_();
+    }
+}
+    
     
 /*设置读、写、关闭和错误回调*/
 void setReadCallback(const ReadEventCallback& cb)
@@ -88,5 +109,4 @@ private:
     EventCallback errorCallback_;
 
 };
-
 #endif
