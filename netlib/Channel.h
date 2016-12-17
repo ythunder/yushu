@@ -24,8 +24,8 @@ public:
     typedef std::function<void()> ReadEventCallback;
 
     /*构造函数*/
-   Channel(EventLoop* loop, int fd)
-    :loop_(loop),
+   Channel(int eventfd, int fd)
+    :loopfd_(eventfd),
     fd_(fd),
     events_(0),
     revents_(0)
@@ -37,9 +37,9 @@ public:
 }
 
 
-EventLoop* ownerLoop()
+int ownerLoop()
 {
-    return loop_;    
+    return loopfd_;    
 }
 
 
@@ -60,6 +60,7 @@ void handleEvent()
     }
 }
     
+
     
 /*设置读、写、关闭和错误回调*/
 void setReadCallback(const ReadEventCallback& cb)
@@ -98,7 +99,7 @@ private:
     static const int kReadEvent;
     static const int kWriteEvent;
 
-    EventLoop* loop_;    //事件所在循环
+    int loopfd_;    //事件所在循环
     const int fd_;       //监听的fd
     int events_;         //关注的事件
     int revents_;        //当前活跃事件

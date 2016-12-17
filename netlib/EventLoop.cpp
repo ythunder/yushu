@@ -27,7 +27,8 @@ EventLoop::EventLoop(int eventfd)
     quit_(false),
     threadId_(::syscall(SYS_gettid)),
     currentActiveChannel_(NULL),
-    poller_(new Epoller())
+    poller_(new Epoller()),
+    wakeupChannel_(new Channel(eventfd, eventfd))
 {
 }
 
@@ -35,6 +36,14 @@ EventLoop::EventLoop(int eventfd)
 EventLoop::~EventLoop()
 {
 }
+
+
+void EventfdReadCallback()
+{
+    
+
+}
+
 
 
 void 
@@ -45,20 +54,25 @@ EventLoop::loop()
     looping_ = true;
     quit_ = false;
     
+    updateChannel(wakeupChannel_);   //将loop自己的eventfd加入epoll中
+    
+
     while(!quit_)
     {
         activeChannels_.clear();   //清空活跃事件
-        poller_->poll(10000, &activeChannels_);
+        if( (poller_->poll(10000, &activeChannels_)) > 0) 
+        {
+            std::cout << "event happend!" << std::endl;
+        for(ChannelList::iterator it=activeChannels_.begin(); 
+            it != activeChannels_.end();
+            ++it)
+        {
+            currentActiveChannel_ = *it;
+            currentActiveChannel_->handleEvent();
+        }
+        currentActiveChannel_ = NULL;
+        }
     }
-    
-    for(ChannelList::iterator it=activeChannels_.begin(); 
-       it != activeChannels_.end();
-       ++it)
-    {
-        currentActiveChannel_ = *it;
-        currentActiveChannel_->handleEvent();
-    }
-    currentActiveChannel_ = NULL;
 }
 
 void 
@@ -73,7 +87,7 @@ EventLoop::quit()
 void 
 EventLoop::updateChannel(Channel* channel)
 {
-    assert(channel->ownerLoop() == this);
+    assert(channel->ownerLoop() == eventfd_);
     assert(assertInLoopThread() == true);
     poller_->updateChannel(channel);
 }
@@ -81,7 +95,7 @@ EventLoop::updateChannel(Channel* channel)
 void 
 EventLoop::removeChannel(Channel* channel)
 {
-    assert(channel->ownerLoop() == this);
+    assert(channel->ownerLoop() == eventfd_);
     assert(assertInLoopThread() == true);
     poller_->removeChannel(channel);
 }

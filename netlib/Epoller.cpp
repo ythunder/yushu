@@ -14,6 +14,9 @@
 #include <unistd.h>
 
 
+
+
+
 Epoller::Epoller()
     :epollfd_(::epoll_create(5)),
     events_(kInitEventListSize)
@@ -52,10 +55,6 @@ Epoller::poll(int timeoutMs, ChannelList* activeChannels)
     {
         fillActiveChannels(numEvents, activeChannels);
     }
-    else if(numEvents == 0)
-    {
-        std::cout << "没有活跃事件\n";
-    }
     else
     {
         
@@ -68,9 +67,11 @@ Epoller::poll(int timeoutMs, ChannelList* activeChannels)
 
 
 
+
 void 
 Epoller::updateChannel(Channel* channel)
 {
+    channel->setReadCallback();
     struct epoll_event event;
     bzero(&event, sizeof(event));
     event.events = channel->events();

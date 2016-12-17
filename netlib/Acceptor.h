@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include "Eventloop_Threadpool.h"
+#include <unistd.h>
 
 class Acceptor
 {
@@ -28,8 +29,8 @@ public:
     {
         int fd = loopThreadPoolPtr_->getNextLoop();  //得到connfd将要去的循环的fd
         std::cout << "get loop evetfd " << fd << std::endl;
-        int buff = connfd;
-        int ret = write(fd, &buff, sizeof(buff));   //送它去
+        ssize_t  buff = static_cast<ssize_t>(connfd);
+        ssize_t ret = write(fd, &buff, sizeof(buff));   //送它去
         assert(ret == sizeof(buff));
     }
 
@@ -71,14 +72,6 @@ public:
     }   
 
 
-
-
-    /*设置新连接回调函数
-    void setNewConnectionCallback(NewConnectionCallback cb)
-    {
-        newConnectionCallback_ = cb;
-    }
-*/
 
     Socket getSocket()
     {

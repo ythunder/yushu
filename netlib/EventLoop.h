@@ -48,7 +48,7 @@ private:
     std::shared_ptr<Epoller> poller_;    /*当前循环的poll*/
     
     int eventfd_;     /*唤醒eventfd*/
-   // boost::scoped_ptr<Channel> wakeupChannel_;  /*唤醒eventfd对应的Channel*/  
+    Channel* wakeupChannel_;  /*唤醒eventfd对应的Channel*/  
 
     typedef std::vector<Channel*> ChannelList;
     ChannelList activeChannels_;      /*活跃事件表*/

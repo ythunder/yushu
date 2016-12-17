@@ -15,6 +15,7 @@
 #include <iostream>
 #include "callback.h"
 #include "EventLoop.h"
+#include <utility>
 
 
 
@@ -62,7 +63,7 @@ LoopThreadPool::start()
     for(int i=0; i<loopNumber_; ++i)
     {
         fd = createEventFd();
-        fdMap_.insert({i+1,fd});
+        fdMap_.insert(std::pair<int,int>(i+1, fd));   //用树字对应fd存入fd_Map
         
        threadVector_.push_back(std::make_shared<std::thread>(threadFunc, fd, this));  //将新创建对象加入容器
     }
