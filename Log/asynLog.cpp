@@ -33,7 +33,7 @@ AsynLog::~AsynLog()
 }
 
 
-/*将单行日志整理成行写入buffer*/
+/*将单行日志行写入buffer*/
 void 
 AsynLog::append(char *logline, LogLevel level)
 {
