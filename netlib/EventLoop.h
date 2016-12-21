@@ -21,25 +21,8 @@ class Epoller;
 
 class EventLoop
 {
-public:
-
-    EventLoop(int eventfd);
-    ~EventLoop();
-
-    void loop();   //开始循环
-
-    void quit();  //退出循环
-
-    void updateChannel(Channel* channel);  //更新事件分发表
-
-    void removeChannel(Channel* channel);  //移除事件分发器
-
-    bool assertInLoopThread();   //判断是否在当前线程
-
-
-    void handleRead();
-
 private:
+
     bool looping_;
     bool quit_;
 
@@ -50,10 +33,38 @@ private:
     int eventfd_;     /*唤醒eventfd*/
     Channel* wakeupChannel_;  /*唤醒eventfd对应的Channel*/  
 
+    /*
     typedef std::vector<Channel*> ChannelList;
-    ChannelList activeChannels_;      /*活跃事件表*/
+    ChannelList activeChannels_;      //活跃事件表
 
-    Channel* currentActiveChannel_;   /*当前正在处理的活跃事件*/
+    Channel* currentActiveChannel_;   //当前正在处理的活跃事件
+*/
+
+
+public:
+
+    EventLoop(int eventfd);
+    ~EventLoop();
+
+    void loop();   //开始循环
+
+    void quit();  //退出循环
+
+    
+
+    //void updateChannel(Channel* channel);  //更新事件分发表
+
+    void removeChannel(Channel* channel);  //移除事件分发器
+
+    bool assertInLoopThread();   //判断是否在当前线程
+
+
+    void handleRead();
+
+    int getloop_eventfd()
+    {
+        return eventfd_;
+    }
 
 };
 

@@ -29,7 +29,7 @@ Epoller::~Epoller()
 }
 
 
-/*将epoll_wait得到的活跃事件表逐个包装成channel加入activeChannels*/
+/*//将epoll_wait得到的活跃事件表逐个包装成channel加入activeChannels
 void 
 Epoller::fillActiveChannels(int numEvents, ChannelList* activeChannels)
 {
@@ -40,24 +40,19 @@ Epoller::fillActiveChannels(int numEvents, ChannelList* activeChannels)
         activeChannels->push_back(channel);
     }
 }
-
+*/
 
 int 
-Epoller::poll(int timeoutMs, ChannelList* activeChannels)
+Epoller::poll(int timeoutMs, struct epoll_event* events)
 {
-
     int numEvents = ::epoll_wait(epollfd_,
-                               &*events_.begin(),
-                               static_cast<int>(events_.size()),
+                               events,
+                               events_,
                                timeoutMs);
-
-    if(numEvents > 0)
+    if(numEvents < 0)
     {
-        fillActiveChannels(numEvents, activeChannels);
-    }
-    else
-    {
-        
+        int saveError = errno;
+        std::cout << "errno = " << saveError;
          //标准错误判断
     }
 
@@ -66,20 +61,19 @@ Epoller::poll(int timeoutMs, ChannelList* activeChannels)
 
 
 
-
-
 void 
-Epoller::updateChannel(Channel* channel)
+Epoller::updateChannel(int new_fd)
 {
-    channel->setReadCallback();
+    std::cout << "new_fd 传入时:= " << new_fd << std::endl;
     struct epoll_event event;
     bzero(&event, sizeof(event));
-    event.events = channel->events();
-    event.data.ptr = channel;
-    int fd = channel->fd();
-    if( ::epoll_ctl(epollfd_,EPOLL_CTL_ADD, fd, &event) < 0)
+    event.data.fd = new_fd;
+    event.events = EPOLLIN;
+    if( ::epoll_ctl(epollfd_,EPOLL_CTL_ADD, new_fd, &event) < 0)
     {
+        std::cout << "Epoller.cpp文件：" << "updateChannel函数中epoll_ctl调用失败" << "此时：new_fd = "<< new_fd << "   内核表fd= " << epollfd_ << std::endl;
         int saveError = errno;
+        std::cout << "epoll_ctl errno = " << saveError << std::endl;
         /*错误处理*/
     }
 }
@@ -94,18 +88,3 @@ Epoller::removeChannel(Channel* channel)
     }
 }
 
-/*
-private:
-    int kInitEventListSize = 16;
-
-    int epollfd_;
-
-    typedef std::map<int, Channel*> ChannelMap;
-    ChannelMap channels_;
-
-    typedef std::vector<struct epoll_event> EventList;
-    EventList events_;  
-
-    EventLoop* ownerLoop_;
-};
-*/

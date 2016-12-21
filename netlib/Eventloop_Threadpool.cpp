@@ -62,6 +62,7 @@ LoopThreadPool::start()
     int fd;
     for(int i=0; i<loopNumber_; ++i)
     {
+        sleep(1);
         fd = createEventFd();
         fdMap_.insert(std::pair<int,int>(i+1, fd));   //用树字对应fd存入fd_Map
         
@@ -85,6 +86,7 @@ LoopThreadPool::createEventFd()
 
 void threadFunc(int eventfd, LoopThreadPool *loopThreadPool)
 {
+    std::cout << "create a loop, events = " << eventfd << std::endl;
     EventLoop loop(eventfd);
     loop.loop();                //启动循环
 

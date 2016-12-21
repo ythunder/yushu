@@ -28,9 +28,10 @@ public:
     void connectionhandle(int connfd, struct sockaddr_in addr)
     {
         int fd = loopThreadPoolPtr_->getNextLoop();  //得到connfd将要去的循环的fd
-        std::cout << "get loop evetfd " << fd << std::endl;
+        std::cout << "Acceptor.h文件：为connfd分配loop, loop_id 为" << fd << std::endl;
         ssize_t  buff = static_cast<ssize_t>(connfd);
         ssize_t ret = write(fd, &buff, sizeof(buff));   //送它去
+        std::cout << "将connfd存入buff为" << buff << "写入loop_id中" << std::endl;
         assert(ret == sizeof(buff));
     }
 
@@ -66,6 +67,7 @@ public:
         int connfd = accpetSocket_.accept(&clientAddress); //接收连接
         if(connfd > 0)
         {
+            std::cout << "Acceptor.h文件: get a new connection, connfd = " << connfd << std::endl;
             connectionhandle(connfd, clientAddress);
         }
         }

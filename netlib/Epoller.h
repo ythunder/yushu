@@ -22,16 +22,6 @@ class Channel;
 class Epoller
 {
 
-public:
-    typedef std::vector<Channel *> ChannelList;
-    Epoller();
-    ~Epoller();
-
-    int poll(int timeoutMs, ChannelList* activeChannels);
-    void updateChannel(Channel* channel);
-    void removeChannel(Channel* channel);
-    void fillActiveChannels(int numEvents, ChannelList* activeChannels);
-
 private:
 
     int kInitEventListSize = 16;
@@ -41,10 +31,19 @@ private:
     typedef std::map<int, Channel*> ChannelMap;
     ChannelMap channels_;
 
-    typedef std::vector<struct epoll_event> EventList;
-    EventList events_;  
+    int events_;  
 
     EventLoop* ownerLoop_;
+public:
+    typedef std::vector<Channel *> ChannelList;
+    Epoller();
+    ~Epoller();
+
+    int poll(int timeoutMs, struct epoll_event* events);
+    void updateChannel(int new_fd);
+    void removeChannel(Channel* channel);
+    void fillActiveChannels(int numEvents, ChannelList* activeChannels);
+
 };
 
 #endif
