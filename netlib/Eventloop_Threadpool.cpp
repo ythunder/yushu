@@ -13,11 +13,10 @@
 #include <memory>
 #include <functional>
 #include <iostream>
-#include "callback.h"
-#include "EventLoop.h"
+#include "event_loop.h"
 #include <utility>
-
-
+#include <unistd.h>
+#include <sstream>
 
 void threadFunc(int eventfd, LoopThreadPool *loopThreadPool);
 
@@ -64,9 +63,9 @@ LoopThreadPool::start()
     {
         sleep(1);
         fd = createEventFd();
-        fdMap_.insert(std::pair<int,int>(i+1, fd));   //用树字对应fd存入fd_Map
+        fdMap_.insert(std::pair<int,int>(i+1, fd));   //用数字对应fd存入fd_Map
         
-       threadVector_.push_back(std::make_shared<std::thread>(threadFunc, fd, this));  //将新创建对象加入容器
+        threadVector_.push_back(std::make_shared<std::thread>(threadFunc, fd, this));  //将新创建对象加入容器
     }
 }
 
@@ -86,9 +85,14 @@ LoopThreadPool::createEventFd()
 
 void threadFunc(int eventfd, LoopThreadPool *loopThreadPool)
 {
-    std::cout << "create a loop, events = " << eventfd << std::endl;
+    std::stringstream stream_eventfd;
+    std::string evenfd_string;
+    stream_eventfd << eventfd;
+    stream_eventfd >> evenfd_string;
+
+    std::string last_string = "创建一个线程，evenfd为" + evenfd_string ;
+    std::cout << last_string << std::endl;
     EventLoop loop(eventfd);
     loop.loop();                //启动循环
-
 }
 

@@ -12,12 +12,12 @@
 #include <map>
 #include <vector>
 #include "Channel.h"
-#include "EventLoop.h"
+#include "event_loop.h"
 
 //struct epoll_event;
 
-class EventLoop;
 class Channel;
+class EventLoop;
 
 class Epoller
 {

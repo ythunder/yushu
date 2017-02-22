@@ -13,13 +13,15 @@
 #include <functional>
 #include "Socket.h"
 #include "Channel.h"
-#include "EventLoop.h"
+#include "event_loop.h"
 #include "callback.h"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include "Eventloop_Threadpool.h"
 #include <unistd.h>
+#include <string>
+#include <assert.h>
 
 class Acceptor
 {
@@ -31,13 +33,12 @@ public:
         std::cout << "Acceptor.h文件：为connfd分配loop, loop_id 为" << fd << std::endl;
         ssize_t  buff = static_cast<ssize_t>(connfd);
         ssize_t ret = write(fd, &buff, sizeof(buff));   //送它去
-        std::cout << "将connfd存入buff为" << buff << "写入loop_id中" << std::endl;
         assert(ret == sizeof(buff));
     }
 
 
 /*初始化loop池,创建监听套接字，初始化事件分发器*/
-   Acceptor(char* ip, int port, int loopNumber)
+    Acceptor(std::string ip, int port, int loopNumber)
     :accpetSocket_(::socket(PF_INET,SOCK_STREAM, 0)),
     loopThreadPoolPtr_(std::make_shared<LoopThreadPool>(loopNumber))
     {
@@ -68,20 +69,25 @@ public:
         if(connfd > 0)
         {
             std::cout << "Acceptor.h文件: get a new connection, connfd = " << connfd << std::endl;
-            connectionhandle(connfd, clientAddress);
+            connectionhandle(connfd, clientAddress);    //
         }
         }
     }   
 
 
+    void setMessageCallback(MessageCallback cb)
+    {
+        messageCallback_ = cb;
+    }
 
     Socket getSocket()
     {
         return accpetSocket_;
     }
 private:
+
     std::shared_ptr<LoopThreadPool> loopThreadPoolPtr_;
-    Socket    accpetSocket_;
+    Socket    accpetSocket_;                               //监听socket
     NewConnectionCallback newConnectionCallback_;
     MessageCallback messageCallback_;
     CloseCallback   closeCallback_;

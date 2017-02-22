@@ -9,11 +9,10 @@
 #define CHANNEL_H
 
 #include "Timestamp.h"
-#include "EventLoop.h"
+#include "event_loop.h"
 #include <functional>
 #include <memory>
 #include <poll.h>
-#include "callback.h"
 
 class EventLoop;
 

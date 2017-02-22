@@ -17,13 +17,15 @@
 #include <sys/eventfd.h>
 
 
-
 class LoopThreadPool
 {
 public:
     LoopThreadPool(int number);
+
     ~LoopThreadPool();
+
     int getNextLoop();
+
     void start();
 
     int createEventFd();
@@ -33,7 +35,7 @@ public:
         messageCallback_ = cb;
     }
 
-    MessageCallback getMessageCallback()
+    const MessageCallback getMessageCallback()
     {
         return messageCallback_;
     }
@@ -43,7 +45,7 @@ public:
         closeCallback_ = cb;
     }
     
-    CloseCallback getCloseCallback()
+    const CloseCallback getCloseCallback()
     {
         return closeCallback_;
     }
@@ -53,7 +55,7 @@ public:
         writeCompleteCallback_ = cb;
     }
     
-    WriteCompleteCallback getWriteCompleteCallback()
+    const WriteCompleteCallback getWriteCompleteCallback()
     {
         return writeCompleteCallback_;
     }

@@ -12,8 +12,7 @@
 #include <sys/epoll.h>
 #include <string.h>
 #include <unistd.h>
-
-
+#include <sstream>
 
 
 
@@ -64,14 +63,21 @@ Epoller::poll(int timeoutMs, struct epoll_event* events)
 void 
 Epoller::updateChannel(int new_fd)
 {
-    std::cout << "new_fd 传入时:= " << new_fd << std::endl;
+    std::stringstream stream_newfd;
+    std::string newfd_string;
+    stream_newfd << new_fd;
+    stream_newfd >> newfd_string;
+
+    std::string last_string = "new_fd传入Poller监听队列，new_fd = " + newfd_string;
+    std::cout << last_string << std::endl;
+
     struct epoll_event event;
     bzero(&event, sizeof(event));
     event.data.fd = new_fd;
     event.events = EPOLLIN;
     if( ::epoll_ctl(epollfd_,EPOLL_CTL_ADD, new_fd, &event) < 0)
     {
-        std::cout << "Epoller.cpp文件：" << "updateChannel函数中epoll_ctl调用失败" << "此时：new_fd = "<< new_fd << "   内核表fd= " << epollfd_ << std::endl;
+        std::cout << "Epoller.cpp 文件出错了"<< std::endl;
         int saveError = errno;
         std::cout << "epoll_ctl errno = " << saveError << std::endl;
         /*错误处理*/

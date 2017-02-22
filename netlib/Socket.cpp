@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include "Socket.h"
+#include <iostream>
 #include <errno.h>
 #include <iostream>
 #include <fcntl.h>
@@ -18,12 +19,24 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <netinet/tcp.h>
+#include <string>
+#include <sstream>
+
 
 
 Socket::Socket(int sockfd)
     :sockfd_(sockfd)
 {
+    std::stringstream stream_socket;
+    std::string socket_string;
+    stream_socket << sockfd;
+    stream_socket >> socket_string;
+    
+    std::string last_string = "创建监听socket，只有一个, socket = " + socket_string;
+
+    std::cout << last_string << std::endl;
    setNonBlocking();
+    setReusePort(true);
 }
 
 Socket::~Socket()
@@ -49,18 +62,20 @@ setNonBlock(int connfd)
 }
 
 void 
-Socket::bindAddress(char* ip, int port)
+Socket::bindAddress(std::string ip, int port)
 {
+
+    const char* cip = ip.c_str();
     struct sockaddr_in address;
     bzero( &address, sizeof(address) );
     address.sin_family = AF_INET;
-    inet_pton( AF_INET, ip, &address.sin_addr );
+    inet_pton( AF_INET, cip, &address.sin_addr );
     address.sin_port = htons( port);
 
     int ret = ::bind(sockfd_, (struct sockaddr*)&address, sizeof(address));
     if(ret < 0)
     {
-        std::cout << errno ;
+        std::cout << errno;
     }
     assert( ret != -1 );
 }
@@ -79,10 +94,6 @@ Socket::accept(struct sockaddr_in* addr)
     socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
     int connfd = ::accept(sockfd_, (struct sockaddr*)&addr, &addrlen);
     setNonBlock(connfd);
-    if(connfd > 0)
-    {
-        std::cout << "accept a connection\n";
-    }
     if(connfd < 0)
     {
         int saveErrno = errno;
@@ -114,7 +125,6 @@ ssize_t
 Socket::read(int connfd, void* buf, size_t count)
 {
      ssize_t ret = ::read(connfd, buf, count);
-    std::cout << (char*)buf << std::endl;
     return ret;
 }
 
@@ -122,7 +132,6 @@ ssize_t
 Socket::write(const void* buf, size_t count)
 {
     ssize_t ret =  ::write(sockfd_, buf, count);
-    std::cout << (char*)buf << std::endl;
     return ret;
 }
 

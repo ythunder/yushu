@@ -9,6 +9,7 @@
 #define _SOCKET_H
 
 #include <sys/types.h>
+#include <string>
 
 class Socket
 {
@@ -23,7 +24,7 @@ public:
 
     ssize_t write(const void* buf, size_t count);    //写入
 
-    void bindAddress(char* ip, int port);   //绑定地址
+    void bindAddress(std::string ip, int port);   //绑定地址
 
     void listen();    //监听
 
