@@ -79,10 +79,16 @@ public:
     }
 
 
-    Buffer& get_inputbuffer() 
+    Buffer& get_inputBuffer() 
     {
         return inputBuffer_;
     }
+
+    Buffer& get_outputBuffer()
+    {
+        return outputBuffer_;
+    }
+    
 
     int get_fd()
     {

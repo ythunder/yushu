@@ -33,6 +33,7 @@ EventLoop::EventLoop(int eventfd)
     poller_(new Epoller()),
     objectPool_(1024, 0, poller_)
 {
+
 }
 
 
@@ -78,10 +79,10 @@ EventLoop::handleEventFdRead()
 void 
 EventLoop::handleRead(int fd)
 {
-    char buff[30];
-    ssize_t bb = read(fd, &buff, sizeof(buff));
+    int bit = connectionMap_[fd]->get_inputBuffer().readFromFd(fd);
 
-    if(bb > 0) 
+/*
+     if(bb > 0) 
     {
         std::stringstream stream_bit;
         std::string bit_string;
@@ -90,19 +91,21 @@ EventLoop::handleRead(int fd)
 
         std::string last_cout = "触发读事件，读得" + static_cast<std::string>(buff) + "共" + bit_string + "字节";
         std::cout <<  last_cout << std::endl;   
-
+*/
         /*
         std::cout << "Connection:" << fd  << std::endl;
         Buffer buffer = connectionMap_[fd]->get_inputbuffer();
 
         std::cout << "buffer 中可读字节数" << buffer.readableSize() << std::endl;
 */
-        messageCallback_(connectionMap_[fd], &connectionMap_[fd]->get_inputbuffer());
+    messageCallback_(connectionMap_[fd], &connectionMap_[fd]->get_inputBuffer());
+/*
     }
 
     else if(bb == 0) {
         handleClose(fd);
     }
+*/
 }
 
 

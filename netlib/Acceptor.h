@@ -45,9 +45,6 @@ public:
         accpetSocket_.bindAddress(ip, port);
         accpetSocket_.setReusePort(true);
         accpetSocket_.listen();
-        loopThreadPoolPtr_->setMessageCallback(messageCallback_);   //设置消息回调
-        loopThreadPoolPtr_->setCloseCallback(closeCallback_);
-        loopThreadPoolPtr_->setWriteCompleteCallback(writeCompleteCallback_);
     }
 
     /*析构*/
@@ -60,9 +57,13 @@ public:
 /*loop池开启，接收新连接*/
     void start(void)
     {
+        loopThreadPoolPtr_->setMessageCallback(messageCallback_);   //设置消息回调
+        loopThreadPoolPtr_->setCloseCallback(closeCallback_);
+        loopThreadPoolPtr_->setWriteCompleteCallback(writeCompleteCallback_);
+
         loopThreadPoolPtr_->start();
         struct sockaddr_in clientAddress;   //保存客户端地址
-    
+ 
         while(1)
         {
         int connfd = accpetSocket_.accept(&clientAddress); //接收连接
@@ -74,7 +75,6 @@ public:
         }
     }   
 
-
     void setMessageCallback(MessageCallback cb)
     {
         messageCallback_ = cb;
@@ -84,6 +84,7 @@ public:
     {
         return accpetSocket_;
     }
+
 private:
 
     std::shared_ptr<LoopThreadPool> loopThreadPoolPtr_;
